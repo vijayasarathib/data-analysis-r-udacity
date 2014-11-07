@@ -244,7 +244,7 @@ tail(mtcars, 3)
 
 mtcars$mpg
 
-# Print out any two other variables to the console.
+?# Print out any two other variables to the console.
 
 
 
