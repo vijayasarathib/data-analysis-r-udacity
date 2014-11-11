@@ -2,117 +2,178 @@ Lesson 4
 ========================================================
 
 ***
-
+In this lesson we will learn how toInvestigate two variable
+make a Scatter Plot
+and hear moira's study in EDA perceive audience size
 ### Scatterplots and Perceived Audience Size
 Notes:
-
+x->actual vs y->perceive.
+We can see that people choose round up number(50,100,200,etc) when they perceived audience size
+In reality, people saw our post saw 100/200 
 ***
 
 ### Scatterplots
 Notes:
 
 ```{r Scatterplots}
-
+library(ggplot2)
+pf = read.csv('../Lesson3/pseudo_facebook.tsv', sep='\t')
+ggplot(aes(x = age, y=friend_count), data = pf) + geom_point()
 ```
 
 ***
 
 #### What are some things that you notice right away?
 Response:
-
+People below thirty would have more friends.there's some extreme where ages>90 (some maybe lying).
+But that also can infer people who fake beyond age 90 have sense of humor hence more friends.
+It's also important to notice the outliers of our data, and make actions how to audit the data.
 ***
 
 ### ggplot Syntax
 Notes:
-
+Need to say aes wrapper in x and y
+have to say what type of geom
 ```{r ggplot Syntax}
-
+summary(pf$age)
+ggplot(aes(x = age, y=friend_count), data = pf) + geom_poin() + xlim(13,90)
 ```
 
 ***
 
 ### Overplotting
 Notes:
-
+Overplotting means we can't exactly see what are the real plotting.
+In this case we want to have a plot represent on 20 plot
+As X(age) is discrete, only attribute point doesn't really describe age. So instead we using jitter
+The warning of ommited missing values because we limit to only age 13-90
 ```{r Overplotting}
-
+ggplot(aes(x = age, y=friend_count), data = pf) + geom_jitter(alpha=1/20) + xlim(13,90)
+  
 ```
 
 #### What do you notice in the plot?
 Response:
-
+We can see more distributed in the plot.
+Also keep in mind alpha=1/20 in geom means it will take 20 points in that coordinat to make it completely black. By doing this we know that most of users(in block of black) seen as age over 30 has below 1000 average friends.
 ***
 
 ### Coord_trans()
 Notes:
 
 ```{r Coord_trans()}
+ggplot(aes(x = age, y=friend_count), data = pf) +
+  geom_point(alpha=1/20,position= position_jitter(h = 0)) + 
+  xlim(13,90)
 
 ```
 
 #### Look up the documentation for coord_trans() and add a layer to the plot that transforms friend_count using the square root function. Create your plot!
 
 ```{r}
-
+ggplot(aes(x = age, y=friend_count), data = pf) +
+  geom_point(alpha=1/20,position= position_jitter(h = 0)) + 
+  xlim(13,90)+
+  coord_trans(y = "sqrt")
+?coord_trans
 ```
 
 #### What do you notice?
-
+It's more distinction to see the friend count.
 ***
 
 ### Alpha and Jitter
 Notes:
 
 ```{r Alpha and Jitter}
-
+ggplot(aes(x = age, y=friendships_initiated, color=gender), data = pf) +
+  geom_point(alpha=1/20,position= position_jitter(h = 0)) + 
+  xlim(13,90)+
+  coord_trans(y = "sqrt")+
+  ggsave('femvsmale.png')
 ```
 
 ***
 
 ### Overplotting and Domain Knowledge
 Notes:
-
+so much can do in scatter plot.
+In MOira's case, we transform axis in percentage, that way we can see percentage of survey guess vs survey actual audience
+still typically we saw 10-20% would have actually 60% seeing our post.
 ***
 
 ### Conditional Means
 Notes:
+not possible to judge quantity in jitter(harder).
+avg friend-Coutn vary over age.
 
 ```{r Conditional Means}
+library(dplyr)
 
+age_groups <- group_by(pf,age)
+pf.fc_by_age <-summarise(age_groups,
+          friend_count_mean = mean(friend_count),
+          friend_count_median = median(friend_count),
+          n = n())
+
+
+head(pf.fc_by_age)
+tail(pf.fc_by_age)
+
+#arrange the order
+pf.fc_by_age <- arrange(pf.fc_by_age, age)
+pf.fc_by_age
 ```
 
 Create your plot!
 
 ```{r Conditional Means Plot}
-
+names(pf.fc_by_age)
+ggplot(aes(age,friend_count_mean), data = pf.fc_by_age) + geom_line()
 ```
 
 ***
 
 ### Overlaying Summaries with Raw Data
 Notes:
-
+quantile = first nth percentage of data that we want to observe
 ```{r Overlaying Summaries with Raw Data}
-
+ggplot(aes(x = age, y=friend_count), data = pf) +
+  geom_point(alpha=1/20,
+             position= position_jitter(h = 0),
+             color = "orange") +
+  geom_line(stat = "summary", fun.y = mean)+
+  geom_line(stat="summary", fun.y = quantile, probs = 0.1,#10% of  users have ~f_count
+            linetype =2, color="blue")+
+  geom_line(stat="summary", fun.y = quantile, probs = 0.9,#90% of  users have ~f_count
+            linetype =2, color="blue")+
+  coord_cartesian(xlim=c(13,70), ylim=c(0,1000))
+?coord_cartesian
 ```
 
 #### What are some of your observations of the plot?
 Response:
-
+We have some jitter at age 69
+majority of users in facebook is below age 30, and have some normal distribution
+Whereas age beyond 70 have some peak upside down(either true or users lying)
 ***
 
 ### Moira: Histogram Summary and Scatterplot
 See the Instructor Notes of this video to download Moira's paper on perceived audience size and to see the final plot.
 
 Notes:
-
+We can see that people have overestimate on the left(graph1) side, right(underestimate), and the graph at 0% which perfectly estimate their audience size.
 ***
 
 ### Correlation
 Notes:
-
+We're going to find the correlation of friend_count, and age
+with -0.02740737 as the result , it's not monotonic, there's isn't correlation between two variable
 ```{r Correlation}
+?cor.test
+cor.test(pf$friend_count,pf$age)
 
+?with
 ```
 
 Look up the documentation for the cor.test function.
@@ -124,38 +185,55 @@ Response:
 
 ### Correlation on Subsets
 Notes:
-
+If not correlated, then perhaps there's some data(outlier) that we need to hinder
+Now we want to subset our data less or equal than 70.
+Don't use inference statistic in place of descriptive statistices
+e.g. based on this graph, we describe that people lonelier with aging
 ```{r Correlation on Subsets}
-with(                 , cor.test(age, friend_count))
+with(     subset(pf, age <= 70)            , cor.test(age, friend_count))
 ```
 
 ***
 
 ### Correlation Methods
 Notes:
-
+we can use pearson, produce cor.test
+spearman produce rho
+and kendall, produce tau 
 ***
 
 ## Create Scatterplots
 Notes:
 
 ```{r}
-
+names(pf)
+ggplot(aes(x = www_likes_received,y =likes_received ), data = pf)+
+  geom_point()
 ```
 
 ***
 
 ### Strong Correlations
 Notes:
+The correlation coefficient is invariant under a linear transformation of either X or Y, and the slope of the regression line when both X and Y have been transformed to z-scores is the correlation coefficient. 
 
+It's important to note that we may not always be interested in the bulk of the data. Sometimes, the outliers ARE of interest, and it's important that we understand their values and why they appear in the data set.
+
+This code will zooming to 95% of most of our data, ignoring outliers.
+What useful method to zoom in!
+We also can smoothing line, by drawing some line, linear model, and see from the line the correlation between the two.
 ```{r Strong Correlations}
-
+ggplot(aes(x = www_likes_received,y =likes_received ), data = pf)+
+  geom_point()+
+  xlim(0,quantile(pf$www_likes_received, 0.95))+
+  ylim(0,quantile(pf$likes_received, 0.95))+
+  geom_smooth(method = "lm", color="red")
 ```
 
 What's the correlation betwen the two variables? Include the top 5% of values for the variable in the calculation and round to 3 decimal places.
 
 ```{r Correlation Calcuation}
-
+cor.test(pf$www_likes_received,pf$likes_received)
 ```
 
 Response:

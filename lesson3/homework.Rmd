@@ -158,7 +158,7 @@ ggplot(data = alco) +
 ```{r}
 library(lubridate)
 library(gridExtra)
-fbfriends = read.csv('birthdaysExample.csv')
+fbfriends = read.csv('../Lesson3/birthdaysExample.csv')
 fbfriends$gf <- mdy(fbfriends$dates)
 fbfriends$year <- year(fbfriends$gf)
 fbfriends$month <- month(fbfriends$gf)
@@ -192,5 +192,6 @@ No
 ```{r}
 dftbmonth = as.data.frame(tbmonth)
 plot(dftbmonth$Var1, dftbmonth$Freq)
+ggplot(aes(Var1,Freq), data = dftbmonth) + geom_point()
 ```
 

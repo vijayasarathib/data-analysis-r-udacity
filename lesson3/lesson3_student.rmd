@@ -50,7 +50,7 @@ data =na.omit(pf)#Omit all the na values
 #names(pf)
 ggplot(aes(x = friend_count), data = subset(pf, !is.na(gender))) + geom_histogram(binwidth = 25) + scale_x_continuous(limits = c(0,1000), breaks = seq(0,1000,50)) + facet_wrap(~gender)
 #names(pf)
-```
+ge```
 count man vs female
 Can also use by function takes categorical,list/indices,function
 ```{r}
