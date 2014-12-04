@@ -5,6 +5,11 @@ In this blog, I want to perform Exploratory Data Analysis with Facebook dataset.
 
 Well this isn't actually a real Facebook dataset. But this pseudo data is provided by Data  Analysts at Facebook. So  we can be assured it's as good as the real one. This Exploratory Data Analysis ranging from my experience from Udacity Course, Exploratory Data Analysis with R, in which I acquired the dataset. You should check it, it's really recommended course.
 
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(fig.width=12, fig.height=8,
+               echo=FALSE, warning=FALSE, message=FALSE)
+```
 
 ```{r}
 pf <- read.csv('pseudo_facebook.tsv',sep='\t')
@@ -63,7 +68,7 @@ Let's see users' age in this dataset.
 ggplot(aes(x = age), data =pf) + geom_histogram(binwidth=1) + scale_x_discrete(breaks=c(0,113,5))
 ```
 
-For some people, they don???t have friend, so the baselog10 of zero(friend_count) = 0, this will get me negative towards infinity which will disrupt this data. So to avoid this I increment all friend count by 1. Natural Log will set better normal distribution over outliers in this data. I also using sqrt to compare log based 10 to convert it to normal distribution.
+For some people, they don't have friend, so the baselog10 of zero(friend_count) = 0, this will get me negative towards infinity which will disrupt this data. So to avoid this I increment all friend count by 1. Natural Log will set better normal distribution over outliers in this data. I also using sqrt to compare log based 10 to convert it to normal distribution.
 
 ```{r}
 library(gridExtra)
@@ -121,7 +126,7 @@ sum(pf$mobile_check_in == 1)/length(pf$mobile_check_in)
 
 With almost 65% user on mobile device, then I know why Facebook should make mobile app. It's very benefit for the company.
 
-Don???t try to understand kinds of data that you have, but also what transformations can you made using your data. In this example I synthesize the data, rather than just mere naturallog/sqrt function
+Don't try to understand kinds of data that you have, but also what transformations can you made using your data. In this example I synthesize the data, rather than just mere naturallog/sqrt function
 
 #Identify the anomaly of the dataset
 
@@ -129,16 +134,16 @@ Don???t try to understand kinds of data that you have, but also what transformat
 ggplot(aes(x = age, y=friend_count), data = pf) + geom_point()
 ```
 
-People below thirty would have more friends.there???s some extreme where ages>90 (some maybe lying). ???s also important to notice the outliers of our data, and make actions how to audit the data.
+People below thirty would have more friends.there's some extreme where ages>90 (some maybe lying). 's also important to notice the outliers of our data, and make actions how to audit the data.
 
-The unusual way is because the Facebook has default first day as default drop down for day-birthday, we should expect the first day is surprisingly high.It may be the case when user just skip over detail, or keep maintaining their privacy. Whatever the case, it???s imp
+The unusual way is because the Facebook has default first day as default drop down for day-birthday, we should expect the first day is surprisingly high.It may be the case when user just skip over detail, or keep maintaining their privacy. Whatever the case, it's imp
 ortant to look over these anomaly and understanding better about the data.
 ed data. Where people that have much larger income encoded in normal income in stackholder.
 
 
 #Overplotting
 
- Overplotting means we can???t exactly see what are the real plotting. In this case I want to have a plot represent on 20 plot As X(age) is discrete, only attribute point doesn???t really describe age. So instead I using jitter. The warning of ommited missing values because I limit to only age 13-70.
+ Overplotting means we can't exactly see what are the real plotting. In this case I want to have a plot represent on 20 plot As X(age) is discrete, only attribute point doesn't really describe age. So instead I using jitter. The warning of ommited missing values because I limit to only age 13-70.
  
  
 ```{r}
@@ -287,7 +292,7 @@ ggplot(aes(x = age, y = friend_count),
   geom_line(fun.y = mean, stat='summary', linetype=2)
 ```
 
-Now by plotting these, we know that the mean graph isn???t entirely artifact.
+Now by plotting these, we know that the mean graph isn't entirely artifact.
 So we want to ask another question. how many friend count the user have each day?
 
 # Friendships Initiated.
@@ -326,7 +331,7 @@ grid.arrange(p1,p2,p3,ncol=1)
 
 By doing smoothing, we also get better understanding about the data. Be caution though, as it also destroy some data that we may want to pay attention.
 
-Many interesting variables are derived from two or more others. For example, we might wonder how much of a person???s network on a service like Facebook the user actively initiated. Two users with the same degree (or number of friends) might be very different if one initiated most of those connections on the service, while the other initiated very few. So it could be useful to consider this proportion of existing friendships that the user initiated. This might be a good predictor of how active a user is compared with their peers, or other traits, such as personality (i.e., is this person an extrovert?).
+Many interesting variables are derived from two or more others. For example, we might wonder how much of a person's network on a service like Facebook the user actively initiated. Two users with the same degree (or number of friends) might be very different if one initiated most of those connections on the service, while the other initiated very few. So it could be useful to consider this proportion of existing friendships that the user initiated. This might be a good predictor of how active a user is compared with their peers, or other traits, such as personality (i.e., is this person an extrovert?).
 
 
 ```{r}
@@ -350,5 +355,4 @@ ggplot(aes(x=tenure,y=prop_initiated),
   geom_smooth(aes(color=year_joined.bucket))
 ```
 
-
-So why people that late join initiate more friendships? Because people with late join, tends to have friends that already on facebook. So they???re catching up by invite their friends.When they first join, they were asked to invite friends that they do know, instead earlier when facebook didn???t implement such system. Facebook has become very famous, and sort of de facto standard for social network. Nonetheless, people (must) use facebook for engaging their network. Like google, many apps nowadays in smartphone using facebook account to quickly login into their account.
+So why people that late join initiate more friendships? Because people with late join, tends to have friends that already on facebook. So they're catching up by invite their friends.When they first join, they were asked to invite friends that they do know, instead earlier when facebook didn't implement such system. Facebook has become very famous, and sort of de facto standard for social network. Nonetheless, people (must) use facebook for engaging their network. Like google, many apps nowadays in smartphone using facebook account to quickly login into their account.
